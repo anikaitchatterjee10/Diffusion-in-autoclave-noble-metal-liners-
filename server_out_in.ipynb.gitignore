@@ -1,0 +1,13 @@
+# Python Bytecode and Environments
+__pycache__/
+*.pyc
+venv/
+.env
+
+# Jupyter and IDE Checkpoints/History
+.ipynb_checkpoints/
+.vscode/
+
+# Operating System Files
+.DS_Store
+*~
