@@ -1,0 +1,161 @@
+import numpy as np
+import pandas as pd
+from scipy.special import erf
+import panel as pn
+from bokeh.plotting import figure
+from bokeh.models import HoverTool, ColumnDataSource
+from bokeh.palettes import Category10
+
+pn.extension()
+
+# 1. Diffusion Parameters (Units: D0 in m^2/s, H in kJ/mol)
+alloy_imp_dict = {
+    "Ni": [(8.5e-11, 120.0), (2.38e-4, 203.0), (1.42e-4, 198.03)],
+    "Cr": [(3.26e-4, 210.0), (2.58e-3, 225.93), (4.27e-4, 208.64)],
+    "Fe": [(9.4e-11, 123.8), (4.66e-4, 209.47), (1.84e-4, 200.53)],
+    "Mo": [(2.23e-6, 158.11), (2.58e-3, 225.93), (4.27e-4, 208.64)],
+    "Co": [(3.00e-11, 124.3), (2.99e-4, 205.21), (1.57e-4, 199.03)],
+    "Nb": [(1.52e-6, 154.4), (2.45e-2, 247.57), (1.69e-3, 221.88)],
+    "Ti": [(1.33e-4, 198.0), (8.58e-4, 215.35), (2.45e-4, 203.31)],
+    "Al": [(1.30e-5, 159.5)],
+    "C":  [(1.08e-7, 128.98)],
+    "Mn": [(1.8e-5, 179.6)],
+    "Si": [(1.8e-5, 149.84), (5.55e-5, 189.01), (9.39e-5, 194.07)],
+    "S":  [(1.65e-4, 167.36), (2.84e-6, 160.43), (4.12e-6, 164.01)],
+    "P":  [(2.64e-7, 137.59), (2.37e-6, 158.69), (3.51e-6, 162.48)],
+    "B":  [(2.28e-7, 136.19)],
+    "Ta": [(2.87e-6, 160.52), (8.55e-2, 259.59), (5.74e-3, 233.62)],
+    "Cu": [(1.23e-4, 193.0), (3.55e-5, 184.71), (6.07e-5, 189.88)],
+    "W":  [(2.30e-6, 158.42), (1.42e-1, 264.45), (1.31e-2, 241.59)],
+    "Zr": [(3.60e-6, 162.72), (3.90e-3, 229.91), (4.64e-4, 209.44)]
+}
+
+PERIODIC_GROUPS = {
+    "All Elements": list(alloy_imp_dict.keys()),
+    "Group 4 (Ti, Zr, Hf)": ["Ti", "Zr"],
+    "Group 5 (Nb, Ta)": ["Nb", "Ta"],
+    "Group 6 (Cr, Mo, W)": ["Cr", "Mo", "W"],
+    "Group 7 (Mn)": ["Mn"],
+    "Group 8 (Fe)": ["Fe"],
+    "Group 9 (Co)": ["Co"],
+    "Group 10 (Ni)": ["Ni"],
+    "Group 11 (Cu)": ["Cu"],
+    "Group 13 (B, Al)": ["B", "Al"],
+    "Group 14 (C, Si)": ["C", "Si"],
+    "Group 15 (P)": ["P"],
+    "Group 16 (S)": ["S"]
+}
+
+alloys = {
+    "Inconel718": dict(dens=8.26, comp={"Ni": 52.5, "Fe":19, "Cr": 19, "Nb":5.125, "Mo":3.050, "Co":1, "Ti":0.9, "Al":0.5, "Mn":0.35, "Si":0.35, "Cu":0.3, "C":0.08, "Ta":0.05, "P":0.015, "S":0.015, "B":0.006, "W":0, "Zr":0}),
+    "Inconel625": dict(dens=8.44, comp={"Ni": 58.6, "Fe":5, "Cr": 22, "Nb":1.75, "Mo":9, "Co":1, "Ti":0, "Al":0.4, "Mn":0.5, "Si":0, "Cu":0, "C":0, "Ta":1.75, "P":0, "S":0, "B":0, "W":0, "Zr":0}),
+    "Rene41": dict(dens=8.249, comp={"Ni": 49.2585, "Fe":5, "Cr": 19, "Nb":0, "Mo":9.75, "Co":11, "Ti":3.15, "Al":1.6, "Mn":0.1, "Si":0.5, "Cu":0.5, "C":0.12, "Ta":0, "P":0, "S":0.015, "B":0.0065, "W":0, "Zr":0}),
+    "Haynes282": dict(dens=8.28, comp={"Ni": 57, "Fe":1.5, "Cr": 20, "Nb":0, "Mo":8.5, "Co":10, "Ti":2.1, "Al":1.5, "Mn":0.3, "Si":0.15, "Cu":0, "C":0.06, "Ta":0, "P":0, "S":0, "B":0.005, "W":0, "Zr":0}),
+    "U720Li": dict(dens=8.09, comp={"Ni": 57.061, "Fe":0, "Cr": 16.5, "Nb":0, "Mo":3, "Co":14.5, "Ti":5.075, "Al":2.55, "Mn":0, "Si":0, "Cu":0, "C":0.09, "Ta":0, "P":0, "S":0, "B":0.015, "W":1.25, "Zr":0.04}),
+    "AD730": dict(dens=8.23, comp={"Ni": 58.1975, "Fe":4.3, "Cr": 16, "Nb":1.1, "Mo":3, "Co":9, "Ti":3.6, "Al":2.25, "Mn":0, "Si":0, "Cu":0, "C":0.01, "Ta":0, "P":0, "S":0, "B":0.0125, "W":2.5, "Zr":0.03}),
+    "CoWAlloy1": dict(dens=8.83, comp={"Ni": 32, "Fe":0, "Cr": 12, "Nb":0, "Mo":0, "Co":42.3, "Ti":2.5, "Al":6, "Mn":0, "Si":0.4, "Cu":0, "C":0.08, "Ta":1.5, "P":0, "S":0, "B":0.08, "W":3, "Zr":0.01}),
+    "CoWAlloy2": dict(dens=8.9, comp={"Ni": 32, "Fe":0, "Cr": 12, "Nb":0, "Mo":0, "Co":40.8, "Ti":0.3, "Al":9, "Mn":0, "Si":0.4, "Cu":0, "C":0.08, "Ta":0.2, "P":0, "S":0, "B":0.08, "W":5, "Zr":0.01}),
+    "TZM": dict(dens=10.22, comp={"Ni": 0, "Fe":0, "Cr": 0.12, "Nb":0, "Mo":99.3714, "Co":0.408, "Ti":0.003, "Al":0.09, "Mn":0, "Si":0.004, "Cu":0, "C":0.0008, "Ta":0.0002, "P":0, "S":0, "B":0.0008, "W":0, "Zr":0})
+}
+
+atom_database = {
+    "Ni": 58.69, "Fe": 55.85, "Cr": 52.00, "Nb": 92.91, "Mo": 95.95, "Co": 58.93,
+    "Ti": 47.87, "Al": 26.98, "Mn": 54.94, "Si": 28.09, "Cu": 63.55, "C": 12.01,
+    "Ta": 180.95, "P": 30.97, "S": 32.07, "B": 10.81, "W": 183.84, "Zr": 91.22
+}
+
+R = 8.31446e-3 
+ELEMENTS = list(alloy_imp_dict.keys())
+X_GRID = np.linspace(0, 0.5, 500)
+T_GRID_DAYS = np.linspace(0.1, 1000, 500)
+
+# 2. UI Widgets
+alloy_w = pn.widgets.Select(name="Alloy", options=list(alloys.keys()))
+group_w = pn.widgets.Select(name="Periodic Group Filter", options=list(PERIODIC_GROUPS.keys()))
+temp_w = pn.widgets.IntSlider(name="Temp °C", start=400, end=1000, value=650)
+time_w = pn.widgets.IntInput(name="Time (days)", value=10)
+thick_w = pn.widgets.FloatSlider(name="Thickness (cm)", start=0.01, end=0.3, value=0.1)
+
+override_w = pn.widgets.Checkbox(name="Override Surface Conc.", value=False)
+custom_c0_w = pn.widgets.FloatInput(name="Custom Conc. (cm⁻³)", value=1e20, disabled=True)
+
+override_w.link(custom_c0_w, callbacks={'value': lambda target, event: setattr(target, 'disabled', not event.new)})
+
+# 3. Plots Setup
+def create_fig(title, y_log=False, x_label="Depth (cm)"):
+    return figure(width=850, height=400, title=title, 
+                  y_axis_type="log" if y_log else "linear", 
+                  x_axis_label=x_label, y_axis_label="Conc (cm^-3)")
+
+fig_d_lin = create_fig("Depth Profile (Linear)")
+fig_d_log = create_fig("Depth Profile (Log)", y_log=True)
+fig_t_lin = create_fig("Time Profile (Linear)", x_label="Time (days)")
+fig_t_log = create_fig("Time Profile (Log)", y_log=True, x_label="Time (days)")
+
+sources_depth_line = {el: ColumnDataSource(data=dict(xs=[], ys=[])) for el in ELEMENTS}
+sources_depth_patch = {el: ColumnDataSource(data=dict(xp=[], yp=[])) for el in ELEMENTS}
+sources_time_line = {el: ColumnDataSource(data=dict(xs=[], ys=[])) for el in ELEMENTS}
+sources_time_patch = {el: ColumnDataSource(data=dict(xp=[], yp=[])) for el in ELEMENTS}
+
+colors = Category10[10] * 2
+for i, el in enumerate(ELEMENTS):
+    c = colors[i]
+    for f in [fig_d_lin, fig_d_log]:
+        f.patch('xp', 'yp', source=sources_depth_patch[el], color=c, alpha=0.2, legend_label=el, line_alpha=0)
+        f.multi_line('xs', 'ys', source=sources_depth_line[el], color=c, line_width=2)
+    for f in [fig_t_lin, fig_t_log]:
+        f.patch('xp', 'yp', source=sources_time_patch[el], color=c, alpha=0.2, legend_label=el, line_alpha=0)
+        f.multi_line('xs', 'ys', source=sources_time_line[el], color=c, line_width=2)
+
+for f in [fig_d_lin, fig_d_log, fig_t_lin, fig_t_log]:
+    f.legend.click_policy = "hide"
+    f.legend.label_text_font_size = "8pt"
+
+@pn.depends(alloy_w, group_w, temp_w, time_w, thick_w, override_w, custom_c0_w, watch=True)
+def update_logic(alloy, group, temp, days, thick, override, custom_c0):
+    t_sec_now = days * 86400
+    t_sec_grid = T_GRID_DAYS * 86400
+    T_k = temp + 273.15
+    allowed = PERIODIC_GROUPS[group]
+    comp = alloys[alloy]['comp']
+    dens = alloys[alloy]['dens']
+    
+    for el in ELEMENTS:
+        c_wt = comp.get(el, 0)
+        if el not in allowed or c_wt == 0:
+            sources_depth_line[el].data = dict(xs=[], ys=[])
+            sources_depth_patch[el].data = dict(xp=[], yp=[])
+            sources_time_line[el].data = dict(xs=[], ys=[])
+            sources_time_patch[el].data = dict(xp=[], yp=[])
+            continue
+            
+        if override:
+            c0 = custom_c0
+        else:
+            c0 = (dens * (c_wt/100) * 6.022e23) / atom_database[el]
+            
+        ds = [p[0] * np.exp(-p[1] / (R * T_k)) for p in alloy_imp_dict[el]]
+        d_p = [c0 * (1 - erf(X_GRID / (2 * np.sqrt(d * t_sec_now)))) for d in ds]
+        y_min_d, y_max_d = np.min(d_p, axis=0), np.max(d_p, axis=0)
+        sources_depth_line[el].data = dict(xs=[X_GRID] * len(d_p), ys=d_p)
+        sources_depth_patch[el].data = dict(xp=np.concatenate([X_GRID, X_GRID[::-1]]), 
+                                              yp=np.concatenate([y_min_d, y_max_d[::-1]]))
+        
+        t_p = [c0 * (1 - erf(thick / (2 * np.sqrt(d * t_sec_grid)))) for d in ds]
+        y_min_t, y_max_t = np.min(t_p, axis=0), np.max(t_p, axis=0)
+        sources_time_line[el].data = dict(xs=[T_GRID_DAYS] * len(t_p), ys=t_p)
+        sources_time_patch[el].data = dict(xp=np.concatenate([T_GRID_DAYS, T_GRID_DAYS[::-1]]),
+                                             yp=np.concatenate([y_min_t, y_max_t[::-1]]))
+
+    for f in [fig_d_lin, fig_d_log]: f.x_range.end = thick
+    for f in [fig_t_lin, fig_t_log]: f.x_range.end = days
+
+update_logic(alloy_w.value, group_w.value, temp_w.value, time_w.value, thick_w.value, override_w.value, custom_c0_w.value)
+
+tabs = pn.Tabs(("Depth (Lin)", fig_d_lin), ("Depth (Log)", fig_d_log), ("Time (Lin)", fig_t_lin), ("Time (Log)", fig_t_log))
+
+pn.Column(
+    pn.Row(alloy_w, group_w, temp_w, time_w, thick_w), 
+    pn.Row(override_w, custom_c0_w),
+    tabs
+).servable()
