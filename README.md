@@ -3,7 +3,7 @@
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Panel](https://img.shields.io/badge/built%20with-Panel-0072B2.svg)](https://panel.holoviz.org/)
 [![Bokeh](https://img.shields.io/badge/Bokeh-3.x-EA5C2C.svg)](https://bokeh.org/)
-[![MyBinder]https://hub.bids.mybinder.org/user/anikaitchatterj-e-metal-liners--f2ai26id/lab/tree/server_out_in.ipynb
+[![MyBinder](https://hub.bids.mybinder.org/user/anikaitchatterj-e-metal-liners--f2ai26id/lab/tree/server_out_in.ipynb)
 [![Data: XLSX](https://img.shields.io/badge/data-Mehrer%20Window.xlsx-green.svg)](data/Mehrer_Window.xlsx)
 
 Semi-empirical framework for **predicting transition-metal diffusion through
