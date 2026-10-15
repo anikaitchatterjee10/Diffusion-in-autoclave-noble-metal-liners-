@@ -1,4 +1,4 @@
-# Diffusion in Autoclave Noble-Metal Liners
+# PyLiner-Diffusion in Autoclave Noble-Metal Liners
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Panel](https://img.shields.io/badge/built%20with-Panel-0072B2.svg)](https://panel.holoviz.org/)
 [![Bokeh](https://img.shields.io/badge/Bokeh-3.x-EA5C2C.svg)](https://bokeh.org/)
