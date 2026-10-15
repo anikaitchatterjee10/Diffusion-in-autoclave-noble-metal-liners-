@@ -205,6 +205,4 @@ If you use this code, please cite:
 }
 ```
 
-## ⚖️ License
 
-MIT — see [LICENSE](LICENSE).
