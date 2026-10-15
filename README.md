@@ -11,9 +11,7 @@ silver barriers** under ammonothermal crystal-growth conditions
 
 This repository accompanies the manuscript:
 
-> **A. Chatterjee, V. Y. M. R. Chirala, T. Wostatek, S. Arnold, S. Schimmel**,
-> *"Predicting Transition Metal Diffusion through Silver Barriers at High
-> Temperatures Relevant to Ammonothermal Crystal Growth"*, **Materials** (2026).
+> (Cite)
 
 The framework combines:
 
@@ -193,14 +191,7 @@ Units: `D₀` in m² s⁻¹, `Q` in kJ mol⁻¹.
 
 If you use this code, please cite:
 
-```bibtex
-@article{Chatterjee2026AgDiffusion,
-  title   = {Predicting Transition Metal Diffusion through Silver Barriers
-             at High Temperatures Relevant to Ammonothermal Crystal Growth},
-  author  = {Chatterjee, Anikait and Chirala, V. Y. M. Rajesh and
-             Wostatek, Thomas and Arnold, Simon and Schimmel, Saskia},
-  journal = {Materials},
-  year    = {2026}
+
 }
 ```
 
