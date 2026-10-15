@@ -4,7 +4,7 @@
 [![Panel](https://img.shields.io/badge/built%20with-Panel-0072B2.svg)](https://panel.holoviz.org/)
 [![Bokeh](https://img.shields.io/badge/Bokeh-3.x-EA5C2C.svg)](https://bokeh.org/)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/anikaitchatterjee10/Diffusion-in-autoclave-noble-metal-liners-/main?urlpath=lab)
-[![Data: XLSX](https://img.shields.io/badge/data-Mehrer%20Window.xlsx-green.svg)](data/Mehrer_Window.xlsx)
+[![Data: XLSX](https://img.shields.io/badge/data-Mehrer%20Window.xlsx-green.svg)](data/Diffusion Coefficients.xlsx)
 
 Semi-empirical framework for **predicting transition-metal diffusion through
 silver barriers** under ammonothermal crystal-growth conditions
