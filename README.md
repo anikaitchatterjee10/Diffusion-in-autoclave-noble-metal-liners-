@@ -7,122 +7,74 @@
 
 Semi-empirical methodology for **predicting transition-metal diffusion through silver barriers** under ammonothermal crystal-growth conditions (> 300 °C, 100–400 MPa).
 
+# Predicting Elemental Diffusion through Silver at Temperatures Relevant to Ammonothermal Crystal Growth
+
+Companion code and data for the manuscript **"Predicting Elemental Diffusion through Silver at Temperatures Relevant to Ammonothermal Crystal Growth"** by Anikait Chatterjee, V. Y. M. Rajesh Chirala, Thomas Wostatek, Simon Arnold, and Saskia Schimmel (FAU Erlangen-Nürnberg, Chair of Electron Devices / MPI of Microstructure Physics).
 
 ---
 
-## 🔬 Methodology Overview
+## Overview
 
-### 1. Data Sources & Parameter Compilation
-The calculation workflow compiles pre-exponential factors ($D_0$, in $\text{m}^2\\text{s}^{-1}$) and activation energies ($Q$, in $\text{kJ}\,\text{mol}^{-1}$) across multiple sources:
-* **Experimental Literature Data**: Raw solute diffusion parameters ($D_0$ and $Q$) compiled from published studies for solutes diffusing in silver.
-* **Semi-Empirical Feature Model**: Parameters supporting activation energy ($Q$) estimation following Onodera et al.[cite: 2]
-* **Compiled Predictive Models**: Compiled machine-learning / predictive activation energy ($Q$) estimates (including Zeng et al.)[cite: 2].
-
-### 2. Arrhenius Diffusivity & Log-Diffusivity Evaluation at 600 °C
-For each compiled solute entry with numeric $D_0$ and $Q$ values, the bulk diffusion coefficient at $600\text{ }^\circ\text{C}$ ($873.15\text{ K}$) is evaluated using the Arrhenius relation with the universal gas constant $R = 8.314462618\text{ J}\,\text{mol}^{-1}\,\text{K}^{-1}$ (converting $Q$ from $\text{kJ}\,\text{mol}^{-1}$ to $\text{J}\,\text{mol}^{-1}$), alongside its natural logarithm $\ln(D_{600\,^\circ\text{C}})$[cite: 2]. Solutes can then be ranked in descending order of diffusivity at $600\text{ }^\circ\text{C}$[cite: 2].
-
-### 3. Joint 2D Z-Score Outlier Screening
-To evaluate statistical consistency across solute entries at $600\text{ }^\circ\text{C}$, standardized Z-scores are computed independently for activation energy $Q$ and $\ln(D_{600\,^\circ\text{C}})$ relative to the dataset mean and sample standard deviation[cite: 2]:
-* **Standardized Scores**: Each entry receives a Z-score for $Q$ ($Z_Q$) and a Z-score for $\ln(D_{600\,^\circ\text{C}})$ ($Z_{\ln(D_{600\,^\circ\text{C}})}$)[cite: 2].
-* **Joint 2D Euclidean Distance**: A combined 2D Z-score metric is computed as the Euclidean norm $\sqrt{Z_Q^2 + Z_{\ln(D_{600\,^\circ\text{C}})}^2}$[cite: 2].
-* **Classification Thresholds**:
-  * **Confirmed Outlier**: Joint 2D Z-score distance $> 3.0$[cite: 2]
-  * **Marginal Outlier**: Joint 2D Z-score distance $> 2.0$ (and $\le 3.0$)[cite: 2]
-  * **Typical**: Joint 2D Z-score distance $\le 2.0$[cite: 2]
-
-### 4. Meyer–Neldel Compensation, Estimator Bounding & Barrier Modeling
-* **Meyer–Neldel Correlation**: Total-Least-Squares regression across retained bulk-diffusion datasets yields $\log D_0 = -18.41 + Q / 20.87\text{ kJ}\,\text{mol}^{-1}$ (standard error $0.936$)[cite: 1].
-* **Estimator Bounding**: Multiple activation-energy estimation approaches bound uncertainty for solutes with limited or missing experimental data[cite: 1, 2].
-* **Barrier Performance**: Diffusivities are linked to barrier thickness, exposure time, and impurity concentration limits (such as the SIMS detection limit of $10^{15}\text{ cm}^{-3}$) for autoclave liner evaluation[cite: 1].
+Silver (Ag) barriers (liners, capsules, and coatings) are widely used in ammonothermal crystal growth of nitride semiconductors (such as GaN) to mitigate corrosion and suppress impurity transport from high-temperature, high-pressure autoclave alloys[cite: 1]. This repository provides tools to estimate missing Arrhenius diffusion parameters $(Q, D_0)$ in Ag, propagate parameter uncertainties, and evaluate diffusion-limited breakthrough times ($t_{\text{BT}}$) across ammonothermal reactor configurations[cite: 1].
 
 ---
 
-## 📊 Plots & Results at a Glance
+## Methodology in Brief
 
-### 1. Ammonothermal Autoclave with Ag Liner — Fig. 1
-Schematic of the high-pressure autoclave showing the Ag liner separating supercritical ammonia from the autoclave wall (such as René 41 / Inconel), along with inward-diffusing solute species (Fe, Cr, Mn, Ni, …) and outward species (Ga, N)[cite: 1].
-
-<p align="center">
-  <img src="docs/images/fig1_autoclave.png" width="720">
-  <br>
-  <sub><b>Figure 1.</b> Schematic of the ammonothermal GaN growth autoclave with an Ag liner[cite: 1].</sub>
-</p>
-
-### 2. Activation Energy ($Q$) vs. $\ln(D)$ with Outlier Highlighting — Fig. 2
-Scatter plot of $\ln(D)$ at $600\text{ }^\circ\text{C}$ versus activation energy $Q$ ($\text{kJ}\,\text{mol}^{-1}$) for the compiled Ag solute dataset, distinguishing lower-$Q$ outlier entries ($Q < 145\text{ kJ}\,\text{mol}^{-1}$, such as `Fe1`, `Co2`, `Ni1`) in red from normal entries in blue[cite: 1, 2].
-
-<p align="center">
-  <img src="docs/images/Fig2_excel_outliers.png" width="720">
-  <br>
-  <sub><b>Figure 2.</b> Activation energy (Q) vs. ln(D) at 600 °C for the compiled solute–Ag dataset with low-Q outliers highlighted[cite: 1, 2].</sub>
-</p>
-
-### 3. Meyer–Neldel Plot — Fig. 3
-Correlation between pre-exponential factor $D_0$ and activation energy $Q$ for retained bulk-diffusion datasets, with the dashed trendline representing the Total-Least-Squares fit ($\log D_0 = -18.41 + Q / 20.87\text{ kJ}\,\text{mol}^{-1}$, standard error $0.936$)[cite: 1].
-
-<p align="center">
-  <img src="docs/images/fig3_meyerneldel_Q.png" width="720">
-  <br>
-  <sub><b>Figure 3.</b> Meyer–Neldel plot of pre-exponential factor D₀ versus activation energy Q for solutes in Ag[cite: 1].</sub>
-</p>
-
-### 4. Consistency Check Against Mehrer's Empirical Window — Fig. 4
-Comparison of normalized diffusion parameters for solutes in Ag against Mehrer's empirical range for substitutional solutes in close-packed metals at $600\text{ }^\circ\text{C}$[cite: 1].
-
-<p align="center">
-  <img src="docs/images/fig4_mehrer_window.png" width="720">
-  <br>
-  <sub><b>Figure 4.</b> Comparison of calculated normalized diffusion parameters for solutes in Ag with Mehrer's empirical ranges[cite: 1].</sub>
-</p>
-
-### 5a. Barrier Performance — Time to Reach the SIMS Limit
-Time required for key transition-metal impurities (such as Fe, Cr, and Mn) to reach the SIMS detection limit ($10^{15}\text{ cm}^{-3}$) at the inner Ag liner surface as a function of barrier thickness at $600\text{ }^\circ\text{C}$, showing uncertainty bands across estimation methods and literature data[cite: 1].
-
-<p align="center">
-  <img src="docs/images/fig5a_barrier_performance.png" width="720">
-  <br>
-  <sub><b>Figure 5a.</b> Time to reach the 10¹⁵ cm⁻³ SIMS limit at the inner Ag barrier surface versus barrier thickness[cite: 1].</sub>
-</p>
-
-### 5b. Inner-Surface Concentration vs. Exposure Time
-Time-dependent impurity concentration at the inner surface of a **1 mm Ag liner** at $600\text{ }^\circ\text{C}$ (using **René 41** as a representative autoclave alloy) relative to the SIMS detection limit[cite: 1].
-
-<p align="center">
-  <img src="docs/images/fig5b_conc_vs_time.png" width="720">
-  <br>
-  <sub><b>Figure 5b.</b> Time-dependent inner-surface impurity concentration for a 1 mm Ag liner with René 41[cite: 1].</sub>
-</p>
-
-### 🎥 Interactive Dashboard
-Interactive Panel/Bokeh interface for exploring barrier performance and inner-surface concentration across solutes, alloys, temperatures, liner thicknesses, and exposure times[cite: 1].
-
-<p align="center">
-  <img src="docs/images/dashboard.gif" width="720">
-</p>
+1. **Literature Compilation & Outlier Screening**:
+   - Compiled 43 literature Arrhenius parameter sets for impurity diffusion in Ag and screened outliers at $600\,^\circ\text{C}$ using Z-scores ($|Z| > 2.5$)[cite: 1].
+   - Excluded 3 statistical outliers (Fe, Co, and Ni from a single reference) and fitted a **Meyer–Neldel Rule (MNR)** relation via **Total Least Squares (TLS)** across the remaining 40 datasets ($\text{SEE} = 0.963$ in $\ln D_0$, corresponding to a factor of $\approx 2.6$ in $D_0$)[cite: 1].
+2. **Arrhenius Parameter Estimation**:
+   - Estimated activation energies $Q$ using published data-driven models (ANN and linear regression by Zeng et al., and Ag-specific multiple regression by Onodera et al.)[cite: 1].
+   - Estimated $D_0$ via the MNR correlation, then computed representative parameters using the **arithmetic mean of $Q$** and **geometric mean of $D_0$** (providing complete pairs for data-deficient elements such as B, C, P, Sc, Y, Zr, Hf, and others)[cite: 1].
+3. **1D Bulk Diffusion & Breakthrough Time ($t_{\text{BT}}$)**:
+   - Modeled vacancy-mediated 1D bulk diffusion (Fick's second law) across a barrier of thickness $L$ from a constant alloy source concentration $C_i$ to a semi-infinite boundary, neglecting the minor $p\Delta V$ pressure term ($\lesssim 3.8\text{ kJ mol}^{-1}$ at $\le 400\text{ MPa}$)[cite: 1].
+   - Defined $t_{\text{BT}}$ as the time for concentration at $x = L$ to reach a conservative threshold of $5 \times 10^{14}\text{ cm}^{-3}$ (lowest reported SIMS detection limit for relevant impurities in GaN) and propagated parameter uncertainties into $t_{\text{BT}}$[cite: 1].
+4. **Autoclave & Head-Assembly Case Studies**:
+   - Evaluated **René® 41** ($400\text{–}850\,^\circ\text{C}$, up to $1000\,\mu\text{m}$ liner; and $20\text{–}850\,^\circ\text{C}$, up to $500\,\mu\text{m}$ tube coating) and **stainless steel 1.4571** ($20\text{–}200\,^\circ\text{C}$, up to $500\,\mu\text{m}$ head-assembly coating) for **Fe, Ni, Cr, and Mn**[cite: 1].
 
 ---
 
-## 📁 Repository Structure
+## Plots & Figures
 
-```text
-Diffusion-in-autoclave-noble-metal-liners/
-├── agdiffusion/          Core package (data, physics, plots, dashboard)
-├── data/                 Spreadsheets of diffusion and estimator parameters
-├── docs/images/          Figures displayed in this README
-├── notebooks/            Calculation and exploration notebooks
-├── examples/             Minimal usage scripts
-├── README.md
-├── requirements.txt
-├── pyproject.toml
-└── LICENSE
-```[cite: 1, 2]
+*Update the image paths below to match your repository's figure directory.*
+
+### 1. Meyer–Neldel Screening & Regression
+- **Z-Score Outlier Screening ($\ln D$ at $600\,^\circ\text{C}$ vs. $Q$) & MNR TLS Fit ($\ln D_0$ vs. $Q$)**: Identifies the 3 excluded outliers and shows the TLS regression line with $\pm 1\text{ SEE}$ band[cite: 1].  
+  `![Meyer-Neldel Analysis](figures/fig_mnr_tls.png)`
+
+### 2. Estimated Arrhenius Parameters & Plausibility Domain
+- **Activation Energy $Q$ Comparison Across Elements & Methods**: Compares Method 1 (ANN), Method 2 (linear regression), and Method 3 (MRA) across solutes sorted by atomic number[cite: 1].  
+  `![Activation Energy Comparison](figures/fig_q_comparison.png)`
+- **Pre-Exponential Factor $D_0$ Comparison Across Elements & Methods**: Compares MNR-derived $D_0$ values across estimation methods on a log scale[cite: 1].  
+  `![Pre-Exponential Factor Comparison](figures/fig_d0_comparison.png)`
+- **Mehrer's Plausibility Domain ($D$ at $600\,^\circ\text{C}$ vs. $Q$)**: Benchmarks estimated solute diffusivities and activation energies against FCC substitutional plausibility bounds and Ag self-diffusion[cite: 1].  
+  `![Mehrer Plausibility Domain](figures/fig_mehrer_domain.png)`
+
+### 3. Breakthrough Time vs. Temperature (with Uncertainty Bounds)
+- **95% Confidence Intervals ($1\text{ mm}$ vs. $200\,\mu\text{m}$, $50\text{–}850\,^\circ\text{C}$)**:
+  - **Fe and Ni**[cite: 1]: `![Breakthrough Time Fe and Ni](figures/fig_bt_ci_fe_ni.png)`
+  - **Cr and Mn (Appendix D)**[cite: 1]: `![Breakthrough Time Cr and Mn](figures/fig_bt_ci_cr_mn.png)`
+
+### 4. Temperature–Thickness Breakthrough Time Maps
+- **René® 41 Liner ($400\text{–}850\,^\circ\text{C}$, $0\text{–}1000\,\mu\text{m}$)**:
+  - **Fe and Ni**[cite: 1]: `![Rene 41 Liner Fe and Ni](figures/fig_map_rene41_fe_ni.png)`
+  - **Cr and Mn (Appendix D)**[cite: 1]: `![Rene 41 Liner Cr and Mn](figures/fig_map_rene41_cr_mn.png)`
+- **René® 41 Tube / Head-Assembly Coating ($20\text{–}850\,^\circ\text{C}$, $0\text{–}500\,\mu\text{m}$)**:
+  - **Fe and Ni**[cite: 1]: `![Rene 41 Coating Fe and Ni](figures/fig_map_coating_rene41_fe_ni.png)`
+- **Stainless Steel 1.4571 Head-Assembly Coating ($20\text{–}200\,^\circ\text{C}$, $0\text{–}500\,\mu\text{m}$)**:
+  - **Fe and Ni**[cite: 1]: `![SS 1.4571 Coating Fe and Ni](figures/fig_map_ss14571_fe_ni.png)`
+  - **Cr and Mn (Appendix D)**[cite: 1]: `![SS 1.4571 Coating Cr and Mn](figures/fig_map_ss14571_cr_mn.png)`
+
+### 5. Literature GaN Impurity Benchmark
+- **Reported Impurity Concentrations in Ammonothermal GaN**: Compares literature concentrations for Cr, Mn, Fe, and Ni across mineralizers and barrier configurations[cite: 1].  
+  `![Literature GaN Impurity Concentrations](figures/fig_gan_impurities.png)`
 
 ---
 
-## 📖 Data Overview
+## Citation & Funding
 
-The calculation pipeline uses structured tabular inputs containing solute identifiers, literature references, pre-exponential factors $D_0$ ($\text{m}^2\,\text{s}^{-1}$), activation energies $Q$ ($\text{kJ}\,\text{mol}^{-1}$), and semi-empirical / predictive model columns[cite: 1, 2].
-
+If you use this code or dataset, please cite the accompanying manuscript[cite: 1]. Supported by the **Deutsche Forschungsgemeinschaft (DFG)** (Project No. 512083685) and the **Emerging Talents Initiative (ETI) of FAU Erlangen-Nürnberg**[cite: 1].
 ---
 
 ## 📜 Citation
