@@ -11,9 +11,8 @@ Semi-empirical methodology for **predicting transition-metal diffusion through s
 ---
 
 ## Overview
-
-Silver (Ag) barriers (liners, capsules, and coatings) are widely used in ammonothermal crystal growth of nitride semiconductors (such as GaN) to mitigate corrosion and suppress impurity transport from high-temperature, high-pressure autoclave alloys[cite: 1]. Breakthrough time ($t_{\text{BT}}$) is defined as the time required for an impurity species diffusing through the Ag barrier to reach a concentration of $5 \times 10^{14}\text{ cm}^{-3}$ at the inner, ammonia-facing surface ($x = L$), corresponding to the lowest reported SIMS detection limit among relevant impurities in GaN[cite: 1]. This repository provides tools to estimate missing Arrhenius diffusion parameters $(Q, D_0)$ in Ag, propagate parameter uncertainties, and evaluate diffusion-limited breakthrough times across ammonothermal reactor configurations[cite: 1].
 ---
+Silver (Ag) barriers (liners, capsules, and coatings) are widely used in ammonothermal crystal growth of nitride semiconductors (such as GaN) to mitigate corrosion and suppress impurity transport from high-temperature, high-pressure autoclave alloys[cite: 1]. Breakthrough time ($t_{\text{BT}}$) is defined as the time required for an impurity species diffusing through the Ag barrier to reach a concentration of $5 \times 10^{14}\text{ cm}^{-3}$ at the inner, ammonia-facing surface ($x = L$), corresponding to the lowest reported SIMS detection limit among relevant impurities in GaN[cite: 1]. This repository provides tools to estimate missing Arrhenius diffusion parameters $(Q, D_0)$ in Ag, propagate parameter uncertainties, and evaluate diffusion-limited breakthrough times across ammonothermal reactor configurations[cite: 1].
 
 ## Methodology in Brief
 
