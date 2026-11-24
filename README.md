@@ -5,18 +5,15 @@
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/anikaitchatterjee10/Diffusion-in-autoclave-noble-metal-liners-/main?urlpath=lab)
 [![Data: XLSX](https://img.shields.io/badge/data-Diffusion%20Coefficients.xlsx-green.svg)](data/Diffusion%20Coefficients.xlsx)
 
-Semi-empirical framework for **predicting transition-metal diffusion through silver barriers** under ammonothermal crystal-growth conditions (> 300 °C, 100–400 MPa).
+Semi-empirical methodology for **predicting transition-metal diffusion through silver barriers** under ammonothermal crystal-growth conditions (> 300 °C, 100–400 MPa).
 
-This repository accompanies the manuscript:
-
-> (Cite)[cite: 1]
 
 ---
 
 ## 🔬 Methodology Overview
 
 ### 1. Data Sources & Parameter Compilation
-The calculation workflow compiles pre-exponential factors ($D_0$, in $\text{m}^2\,\text{s}^{-1}$) and activation energies ($Q$, in $\text{kJ}\,\text{mol}^{-1}$) across multiple sources:
+The calculation workflow compiles pre-exponential factors ($D_0$, in $\text{m}^2\\text{s}^{-1}$) and activation energies ($Q$, in $\text{kJ}\,\text{mol}^{-1}$) across multiple sources:
 * **Experimental Literature Data**: Raw solute diffusion parameters ($D_0$ and $Q$) compiled from published studies for solutes diffusing in silver.
 * **Semi-Empirical Feature Model**: Parameters supporting activation energy ($Q$) estimation following Onodera et al.[cite: 2]
 * **Compiled Predictive Models**: Compiled machine-learning / predictive activation energy ($Q$) estimates (including Zeng et al.)[cite: 2].
