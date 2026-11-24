@@ -7,22 +7,19 @@
 
 Semi-empirical methodology for **predicting transition-metal diffusion through silver barriers** under ammonothermal crystal-growth conditions (> 300 °C, 100–400 MPa).
 
-# Predicting Elemental Diffusion through Silver at Temperatures Relevant to Ammonothermal Crystal Growth
-
-Companion code and data for the manuscript **"Predicting Elemental Diffusion through Silver at Temperatures Relevant to Ammonothermal Crystal Growth"** by Anikait Chatterjee, V. Y. M. Rajesh Chirala, Thomas Wostatek, Simon Arnold, and Saskia Schimmel (FAU Erlangen-Nürnberg, Chair of Electron Devices / MPI of Microstructure Physics).
 
 ---
 
 ## Overview
 
-Silver (Ag) barriers (liners, capsules, and coatings) are widely used in ammonothermal crystal growth of nitride semiconductors (such as GaN) to mitigate corrosion and suppress impurity transport from high-temperature, high-pressure autoclave alloys[cite: 1]. This repository provides tools to estimate missing Arrhenius diffusion parameters $(Q, D_0)$ in Ag, propagate parameter uncertainties, and evaluate diffusion-limited breakthrough times ($t_{\text{BT}}$) across ammonothermal reactor configurations[cite: 1].
+Silver (Ag) barriers (liners, capsules, and coatings) are widely used in ammonothermal crystal growth of nitride semiconductors (such as GaN) to mitigate corrosion and suppress impurity transport from high-temperature, high-pressure autoclave alloys. This repository provides tools to estimate missing Arrhenius diffusion parameters $(Q, D_0)$ in Ag, propagate parameter uncertainties, and evaluate diffusion-limited breakthrough times ($t_{\text{BT}}$) across ammonothermal reactor configurations.
 
 ---
 
 ## Methodology in Brief
 
 1. **Literature Compilation & Outlier Screening**:
-   - Compiled 43 literature Arrhenius parameter sets for impurity diffusion in Ag and screened outliers at $600\,^\circ\text{C}$ using Z-scores ($|Z| > 2.5$)[cite: 1].
+   - Compiled 43 literature Arrhenius parameter sets for impurity diffusion in Ag and screened outliers at $600\,^\circ\text{C}$ using Z-scores ($|Z| > 2.5$.
    - Excluded 3 statistical outliers (Fe, Co, and Ni from a single reference) and fitted a **Meyer–Neldel Rule (MNR)** relation via **Total Least Squares (TLS)** across the remaining 40 datasets ($\text{SEE} = 0.963$ in $\ln D_0$, corresponding to a factor of $\approx 2.6$ in $D_0$)[cite: 1].
 2. **Arrhenius Parameter Estimation**:
    - Estimated activation energies $Q$ using published data-driven models (ANN and linear regression by Zeng et al., and Ag-specific multiple regression by Onodera et al.)[cite: 1].
